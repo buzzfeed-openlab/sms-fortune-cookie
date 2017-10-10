@@ -29,6 +29,7 @@ def respond():
 
     # this clears all cookies
     if(incoming_msg=='clear'):
+        session['seen_intro'] = False
         session['seen_prompt'] = False
         session['gave_ans'] = False
         session['extra_msg'] = False
@@ -50,7 +51,10 @@ def respond():
 
 
     if not session.get('seen_prompt',False):
-        resp.sms("hello! want an sms fortune cookie? \nfirst, reply and write a fortune for a random stranger.")
+        if not session.get('seen_intro', False):
+            resp.sms("hello, stranger! I'm a fortune cookie SMS bot.")
+            session['seen_intro'] = True
+        resp.sms("want a random fortune? reply by writing a fortune for someone else to crack open!")
         session['seen_prompt'] = True
 
     elif not session.get('gave_ans',False):
@@ -64,8 +68,8 @@ def respond():
         # TODO: ensure that this is not a fortune from yourself
         random_ans = Answer.query.filter_by(is_approved=True).filter(Answer.from_number!=request.values.get('From')).order_by(func.rand()).first()
 
+        resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:")
         if random_ans:
-            resp.sms("alrighty, I'll sneak that into someone else's fortune cookie. here's your fortune:")
             resp.sms(random_ans.answer_text.upper())
 
             if incoming_msg: # only if there is a msg
@@ -86,14 +90,13 @@ def respond():
                                 body=msg
                             )
         else:
-            # TODO: deal with this
-            resp.sms("thanks! unfortunately I don't have any fortunes to show you b/c I haven't collected enough")
+            resp.sms("404 Fortune Not Found")
 
         session['gave_ans'] = True
     else:
         # TODO: a more elegant way of handling additional messages?
         session['extra_msg'] = True
-        resp.sms("do you want to start over & exchange another album rec? \n(y/n)")
+        resp.sms("do you want to start over & exchange another fortune? \n(y/n)")
 
 
     return str(resp)
