@@ -80,17 +80,17 @@ def respond():
                 # alerting rec-giver when rec has been seen for the first time
                 if random_ans.from_number and random_ans.view_count==1:
                     client = TwilioRestClient(
-                                CONFIG['TWILIO_ACCOUNT_SID'],
-                                CONFIG['TWILIO_AUTH_TOKEN']
+                                CONFIG_VARS['TWILIO_ACCOUNT_SID'],
+                                CONFIG_VARS['TWILIO_AUTH_TOKEN']
                             )
-                    msg = "your fortune (%s) was just delivered to a stranger!" %random_rec.answer_text
+                    msg = "your fortune (%s) was just delivered to a stranger!" %random_ans.answer_text
                     message = client.messages.create(
-                                to=random_rec.from_number,
-                                from_=CONFIG['TWILIO_PHONE_NO'],
+                                to=random_ans.from_number,
+                                from_=CONFIG_VARS['TWILIO_PHONE_NO'],
                                 body=msg
                             )
         else:
-            resp.sms("404 Fortune Not Found")
+            resp.sms("404 FORTUNE NOT FOUND")
 
         session['gave_ans'] = True
     else:
