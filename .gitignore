@@ -1,0 +1,4 @@
+config_vars_secret.py
+
+__pycache__
+.DS_Store
