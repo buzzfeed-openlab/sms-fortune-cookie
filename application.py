@@ -70,7 +70,7 @@ def respond():
 
         resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:")
         if random_ans:
-            resp.sms(random_ans.answer_text.upper())
+            resp.sms(random_ans.answer_text)
 
             if incoming_msg: # only if there is a msg
                 random_ans.view_count = random_ans.view_count+1
@@ -167,7 +167,7 @@ def add_fortune():
 
     if request.method == 'POST':
 
-        new_ans = Answer(None, None, request.form['fortune-text'])
+        new_ans = Answer(None, 'admin', request.form['fortune-text'])
         new_ans.is_approved = True
         db.session.add(new_ans)
         db.session.commit()
