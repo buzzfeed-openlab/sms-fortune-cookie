@@ -28,7 +28,7 @@ def respond():
     incoming_msg = request.values.get('Body', '')
 
     # this clears all cookies
-    if(incoming_msg=='clear'):
+    if(incoming_msg.lower()=='clear'):
         session['seen_intro'] = False
         session['seen_prompt'] = False
         session['gave_ans'] = False
@@ -51,16 +51,21 @@ def respond():
 
 
     if not session.get('seen_prompt',False):
+        # if this is the original interaction with a bot
         if not session.get('seen_intro', False):
-            resp.sms("hello, stranger! I'm a fortune cookie SMS bot.")
+            resp.sms("hello, stranger! I'm a fortune cookie SMS bot.\n\nwant a random fortune? reply by writing a fortune for someone else to crack open!")
             session['seen_intro'] = True
-        resp.sms("want a random fortune? reply by writing a fortune for someone else to crack open!")
+        # if the user is submitting additional fortunes
+        else:
+            resp.sms("want a random fortune? reply by writing a fortune for someone else to crack open!")
+
         session['seen_prompt'] = True
 
     elif not session.get('gave_ans',False):
         # saving answer here
         if incoming_msg: # only if there is a msg
             new_ans = Answer(request.values.get('SmsSid'), request.values.get('From'), incoming_msg)
+            # TODO: error handling here
             db.session.add(new_ans)
             db.session.commit()
 
@@ -71,9 +76,8 @@ def respond():
                                 .order_by(func.rand())\
                                 .first()
 
-        resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:")
         if random_ans:
-            resp.sms(random_ans.answer_text)
+            resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:\n\n%s" %random_ans.answer_text)
 
             if incoming_msg: # only if there is a msg
                 random_ans.view_count = random_ans.view_count+1
@@ -93,7 +97,7 @@ def respond():
                                 body=msg
                             )
         else:
-            resp.sms("404 FORTUNE NOT FOUND")
+            resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:\n\n404 FORTUNE NOT FOUND")
 
         session['gave_ans'] = True
     else:
@@ -181,7 +185,6 @@ def add_fortune():
 @application.route('/initialize')
 @requires_auth
 def initialize():
-    # TODO: only do this if tables don't exist?
     db.create_all()
     return redirect('/')
 
