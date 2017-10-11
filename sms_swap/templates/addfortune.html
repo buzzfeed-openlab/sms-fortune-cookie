@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+      <h1>Manually add a fortune</h1>
+      <hr/>
+
+      <form action="{{ url_for('add_fortune') }}" method="post">
+
+        <div class="form-group">
+          <label for="fortune-text">Fortune</label>
+          <input type="text" class="form-control" id="fortune-text" name="fortune-text" value="">
+        </div>
+
+        <input class="btn btn-success" type="submit" value="SUBMIT">
+      </form>
+
+
+
+    </div>
+  </div>
+</div>
+{% endblock %}

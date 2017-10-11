@@ -58,10 +58,10 @@ def respond():
         session['seen_prompt'] = True
 
     elif not session.get('gave_ans',False):
-        # saving rec here
+        # saving answer here
         if incoming_msg: # only if there is a msg
-            new_rec = Answer(request.values.get('SmsSid'), request.values.get('From'), incoming_msg)
-            db.session.add(new_rec)
+            new_ans = Answer(request.values.get('SmsSid'), request.values.get('From'), incoming_msg)
+            db.session.add(new_ans)
             db.session.commit()
 
         # grabbing a fortune from a stranger
@@ -160,6 +160,19 @@ def disapprove(ans_id):
     ans.is_approved = False
     db.session.commit()
     return redirect('/review')
+
+@application.route('/addfortune', methods=['GET', 'POST'])
+@requires_auth
+def add_fortune():
+
+    if request.method == 'POST':
+
+        new_ans = Answer(None, None, request.form['fortune-text'])
+        new_ans.is_approved = True
+        db.session.add(new_ans)
+        db.session.commit()
+
+    return render_template('addfortune.html')
 
 
 @application.route('/initialize')
