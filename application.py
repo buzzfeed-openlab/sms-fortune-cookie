@@ -66,7 +66,10 @@ def respond():
 
         # grabbing a fortune from a stranger
         # TODO: ensure that this is not a fortune from yourself
-        random_ans = Answer.query.filter_by(is_approved=True).filter(Answer.from_number!=request.values.get('From')).order_by(func.rand()).first()
+        random_ans = Answer.query.filter_by(is_approved=True)\
+                                .filter((Answer.from_number!=request.values.get('From'))|(Answer.from_number == None))\
+                                .order_by(func.rand())\
+                                .first()
 
         resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:")
         if random_ans:
@@ -167,7 +170,7 @@ def add_fortune():
 
     if request.method == 'POST':
 
-        new_ans = Answer(None, 'admin', request.form['fortune-text'])
+        new_ans = Answer(None, None, request.form['fortune-text'])
         new_ans.is_approved = True
         db.session.add(new_ans)
         db.session.commit()
