@@ -37,16 +37,16 @@ def respond():
         return str(resp)
 
 
-    # if exchange has been completed
-    if session.get('extra_msg',False):
-        session['extra_msg'] = False
-        if incoming_msg.lower().startswith('y'):
-            session['seen_prompt'] = False
-            session['gave_ans'] = False
-        elif incoming_msg.lower().startswith('n'):
-            # TODO: ask for feedback?
-            resp.sms('ok, later!')
-            return str(resp)
+    # # if exchange has been completed
+    # if session.get('extra_msg',False):
+    #     session['extra_msg'] = False
+    #     if incoming_msg.lower().startswith('y'):
+    #         session['seen_prompt'] = False
+    #         session['gave_ans'] = False
+    #     elif incoming_msg.lower().startswith('n'):
+    #         # TODO: ask for feedback?
+    #         resp.sms('ok, later!')
+    #         return str(resp)
 
 
 
@@ -100,10 +100,11 @@ def respond():
             resp.sms("excellent, I'll sneak that into someone else's fortune cookie. here's your fortune:\n\n404 FORTUNE NOT FOUND")
 
         session['gave_ans'] = True
-    else:
-        # TODO: a more elegant way of handling additional messages?
+    elif not session.get('extra_msg',False):
         session['extra_msg'] = True
-        resp.sms("do you want to start over & exchange another fortune? \n(y/n)")
+        resp.sms("if you want another fortune, text me again tomorrow!")
+    else:
+        return ''
 
 
     return str(resp)
